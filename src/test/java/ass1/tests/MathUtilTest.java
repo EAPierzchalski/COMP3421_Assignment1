@@ -180,4 +180,38 @@ public class MathUtilTest extends TestCase {
         assertEquals(1.0, m[2][2], EPSILON);    
     }
 
+    @Test
+    public void testInverse() {
+        double[] translation = {2, 3};
+        double rotation = 60;
+        double scale = 3;
+        double[][] m1 = MathUtil.TRSMatrix(translation, rotation, scale);
+        double[][] m2 = MathUtil.inverseTRSMatrix(translation, rotation, scale);
+        double[][] id = MathUtil.identity();
+
+        double[][] m3 = MathUtil.multiply(m2, m1);
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assertEquals(m3[i][j], id[i][j], EPSILON);
+            }
+        }
+    }
+
+    @Test
+    public void testComponentExtracton() {
+        double[] translation = {2, 3};
+        double rotation = 60;
+        double scale = 3;
+        double[][] m = MathUtil.TRSMatrix(translation, rotation, scale);
+        double[] translationComponent = MathUtil.translationComponent(m);
+        double rotationComponent = MathUtil.rotationComponent(m);
+        double scaleComponent = MathUtil.scaleComponent(m);
+
+        assertEquals(translation[0], translationComponent[0], EPSILON);
+        assertEquals(translation[1], translationComponent[1], EPSILON);
+        assertEquals(rotation, rotationComponent, EPSILON);
+        assertEquals(scale, scaleComponent, EPSILON);
+    }
+
 }

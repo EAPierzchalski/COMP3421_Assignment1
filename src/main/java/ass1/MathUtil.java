@@ -1,5 +1,8 @@
 package ass1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A collection of useful math methods 
  *
@@ -134,14 +137,46 @@ public class MathUtil {
     }
 
     public static double[][] TRSMatrix(double[] translation, double rotation, double scale) {
-        double[][] m = multiply(rotationMatrix(rotation), translationMatrix(translation));
-        m = multiply(scaleMatrix(scale), m);
-        return m;
+        List<double[][]> transformations = new ArrayList<double[][]>();
+        transformations.add(translationMatrix(translation));
+        transformations.add(rotationMatrix(rotation));
+        transformations.add(scaleMatrix(scale));
+        return matrixProduct(transformations);
     }
 
     public static double[][] inverseTRSMatrix(double[] translation, double rotation, double scale) {
-        double[][] m = multiply(rotationMatrix(-rotation), scaleMatrix(1/scale));
-        m = multiply(translationMatrix(new double[]{-translation[0], -translation[1]}), m);
+        List<double[][]> transformations = new ArrayList<double[][]>();
+        transformations.add(scaleMatrix(1/scale));
+        transformations.add(rotationMatrix(-rotation));
+        transformations.add(translationMatrix(new double[]{-translation[0], -translation[1]}));
+        return matrixProduct(transformations);
+    }
+
+    public static double[][] matrixProduct(List<double[][]> matrices) {
+        double[][] m = identity();
+        for (double[][] a : matrices) {
+            m = multiply(m, a);
+        }
         return m;
+    }
+
+    public static double[] translationComponent(double[][] matrix) {
+        return new double[]{matrix[0][2], matrix[1][2]};
+    }
+
+    public static double scaleComponent(double[][] matrix) {
+        return norm(new double[]{matrix[0][0], matrix[1][0]});
+    }
+
+    public static double rotationComponent(double[][] matrix) {
+        return normaliseAngle(Math.toDegrees(Math.atan2(matrix[1][0], matrix[0][0])));
+    }
+
+    public static double norm(double[] v) {
+        double sumOfSquares = 0;
+        for (double vi : v) {
+            sumOfSquares += Math.pow(vi, 2);
+        }
+        return Math.pow(sumOfSquares, 0.5);
     }
 }
