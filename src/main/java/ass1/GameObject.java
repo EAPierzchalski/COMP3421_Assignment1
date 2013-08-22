@@ -1,9 +1,8 @@
 package ass1;
 
+import javax.media.opengl.GL2;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.media.opengl.GL2;
 
 
 /**
@@ -274,8 +273,16 @@ public class GameObject {
      * @return a point in world coordinats in [x,y] form
      */
     public double[] getGlobalPosition() {
-        double[] p = new double[2];
-        return p; 
+        if (myParent == null) {
+            return myTranslation;
+        } else {
+            double[][] myTRSMatrix = MathUtil.TRSMatrix(myParent.getGlobalPosition(),
+                    myParent.getGlobalRotation(),
+                    myParent.getGlobalScale());
+            double[] myGlobalPosition = MathUtil.multiply(myTRSMatrix,
+                    new double[]{myTranslation[0], myTranslation[1], 1});
+            return new double[]{myGlobalPosition[0], myGlobalPosition[1]};
+        }
     }
 
     /**
@@ -286,7 +293,11 @@ public class GameObject {
      * @return the global rotation of the object (in degrees) 
      */
     public double getGlobalRotation() {
-        return 0;
+        if (myParent == null) {
+            return myRotation;
+        } else {
+            return MathUtil.normaliseAngle(myParent.getGlobalRotation() + myRotation);
+        }
     }
 
     /**
@@ -297,7 +308,11 @@ public class GameObject {
      * @return the global scale of the object 
      */
     public double getGlobalScale() {
-        return 1.0;
+        if (myParent == null) {
+            return myScale;
+        } else {
+            return myParent.getGlobalScale() * myScale;
+        }
     }
 
     /**
@@ -306,14 +321,27 @@ public class GameObject {
      * TODO: add code so that the object does not change its global position, rotation or scale
      * when it is reparented. 
      * 
-     * @param parent
+     * @param newParent
      */
-    public void setParent(GameObject parent) {
-        
+    public void setParent(GameObject newParent) {
+
         myParent.myChildren.remove(this);
-        myParent = parent;
+        myParent = newParent;
         myParent.myChildren.add(this);
-        
+
+        double[][] invertTRSofNewParent = MathUtil.inverseTRSMatrix(newParent.getGlobalPosition(),
+                newParent.getGlobalRotation(),
+                newParent.getScale());
+
+        double[][] currentTRS = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
+
+        double[][] newParentToMeMatrix = MathUtil.multiply(currentTRS, invertTRSofNewParent);
+
+        myTranslation[0] = newParentToMeMatrix[0][2];
+        myTranslation[1] = newParentToMeMatrix[1][2];
+        myScale = Math.pow(Math.pow(newParentToMeMatrix[0][0], 2) + Math.pow(newParentToMeMatrix[1][0], 2), 1/2);
+        myRotation = Math.atan2(newParentToMeMatrix[1][0], newParentToMeMatrix[0][0]);
+
     }
     
 

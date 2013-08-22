@@ -89,9 +89,11 @@ public class MathUtil {
      * @param pos
      * @return
      */
-    public static double[][] translationMatrix(double[] v) {
-
-        return null;
+    public static double[][] translationMatrix(double[] pos) {
+        double[][] t = identity();
+        t[0][2] = pos[0];
+        t[1][2] = pos[1];
+        return t;
     }
 
     /**
@@ -101,9 +103,15 @@ public class MathUtil {
      * @return
      */
     public static double[][] rotationMatrix(double angle) {
-
-
-        return null;
+        double radians = Math.toRadians(angle);
+        double s = Math.sin(radians);
+        double c = Math.cos(radians);
+        double[][] r = identity();
+        r[0][0] = c;
+        r[0][1] = -s;
+        r[1][0] = s;
+        r[1][1] = c;
+        return r;
     }
 
     /**
@@ -113,9 +121,27 @@ public class MathUtil {
      * @return
      */
     public static double[][] scaleMatrix(double scale) {
-
-        return null;
+        double[][] s = identity();
+        s[0][0] = scale;
+        s[1][1] = scale;
+        return s;
     }
 
-    
+    public static double[][] identity() {
+        return new double[][]{{1, 0, 0},
+                {0, 1, 0},
+                {0, 0, 1}};
+    }
+
+    public static double[][] TRSMatrix(double[] translation, double rotation, double scale) {
+        double[][] m = multiply(rotationMatrix(rotation), translationMatrix(translation));
+        m = multiply(scaleMatrix(scale), m);
+        return m;
+    }
+
+    public static double[][] inverseTRSMatrix(double[] translation, double rotation, double scale) {
+        double[][] m = multiply(rotationMatrix(-rotation), scaleMatrix(1/scale));
+        m = multiply(translationMatrix(new double[]{-translation[0], -translation[1]}), m);
+        return m;
+    }
 }

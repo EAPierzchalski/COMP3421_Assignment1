@@ -27,7 +27,7 @@ public class MathUtilTest extends TestCase {
         // [[1,0,0]
         //  [0,1,0]
         //  [0,0,1]]
-    
+
         assertEquals(1.0, m[0][0], EPSILON);
         assertEquals(0.0, m[0][1], EPSILON);
         assertEquals(0.0, m[0][2], EPSILON);
