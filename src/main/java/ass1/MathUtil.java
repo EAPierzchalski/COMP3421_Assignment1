@@ -137,7 +137,7 @@ public class MathUtil {
     }
 
     public static double[][] TRSMatrix(double[] translation, double rotation, double scale) {
-        List<double[][]> transformations = new ArrayList<double[][]>();
+        List<double[][]> transformations = new ArrayList<double[][]>(3);
         transformations.add(translationMatrix(translation));
         transformations.add(rotationMatrix(rotation));
         transformations.add(scaleMatrix(scale));
@@ -145,7 +145,7 @@ public class MathUtil {
     }
 
     public static double[][] inverseTRSMatrix(double[] translation, double rotation, double scale) {
-        List<double[][]> transformations = new ArrayList<double[][]>();
+        List<double[][]> transformations = new ArrayList<double[][]>(3);
         transformations.add(scaleMatrix(1/scale));
         transformations.add(rotationMatrix(-rotation));
         transformations.add(translationMatrix(new double[]{-translation[0], -translation[1]}));
@@ -180,7 +180,7 @@ public class MathUtil {
         return Math.pow(sumOfSquares, 0.5);
     }
 
-    public static String printMatrix(double[][] m) {
+    public static String matrix2string(double[][] m) {
         StringBuilder matrixStringBuilder = new StringBuilder();
         for (double[] row : m) {
             StringBuilder rowStringBuilder = new StringBuilder();
@@ -199,5 +199,18 @@ public class MathUtil {
             vectorStringBuilder.append(String.format("%f\n", x));
         }
         return vectorStringBuilder.toString();
+    }
+
+    public static boolean areEqual(double[][] a, double[][] b, double epsilon) {
+        boolean eq = true;
+        for (int row = 0; row < a.length; row++) {
+            for (int col = 0; col < a[row].length; col++) {
+                double delta = a[row][col] - b[row][col];
+                if (!(-epsilon < delta && delta < epsilon)) {
+                    eq = false;
+                }
+            }
+        }
+        return eq;
     }
 }

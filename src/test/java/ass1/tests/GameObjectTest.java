@@ -1,10 +1,9 @@
 package ass1.tests;
 
-import org.junit.Test;
-
 import ass1.GameObject;
-
+import ass1.MathUtil;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * COMMENT: Comment GameObjectTest 
@@ -99,6 +98,50 @@ public class GameObjectTest extends TestCase {
     }
 
     @Test
+    public void testGlobalWithComposition() {
+        GameObject parent = new GameObject(GameObject.ROOT);
+        GameObject child = new GameObject(parent);
+
+        double[] parentT = new double[]{1, 0};
+        double parentS = Math.sqrt(2.0);
+        double parentR = 45;
+        parent.translate(parentT[0], parentT[1]);
+        parent.scale(parentS);
+        parent.rotate(parentR);
+
+        double[] childT = new double[]{0, 1};
+        double childS = 2.0;
+        double childR = -90;
+        child.translate(childT[0], childT[1]);
+        child.scale(childS);
+        child.rotate(childR);
+
+        double[] cGPos = child.getGlobalPosition();
+        double cGRot = child.getGlobalRotation();
+        double cGScl = child.getGlobalScale();
+
+        assertEquals(0, cGPos[0], EPSILON);
+        assertEquals(1, cGPos[1], EPSILON);
+        assertEquals(-45, cGRot, EPSILON);
+        assertEquals(2 * Math.sqrt(2.0), cGScl, EPSILON);
+
+
+        //The meat and potatoes: checking that composing the transformation from the parent's global space to the
+        //child's local one is the same as taking the child's global transform.
+        double[][] parentGlobalMatrix = MathUtil.TRSMatrix(parent.getGlobalPosition(),
+                parent.getGlobalRotation(),
+                parent.getGlobalScale());
+        double[][] childGlobalMatrix = MathUtil.TRSMatrix(child.getGlobalPosition(),
+                child.getGlobalRotation(),
+                child.getGlobalScale());
+        double[][] childLocalMatrix = MathUtil.TRSMatrix(child.getPosition(),
+                child.getRotation(),
+                child.getScale());
+
+        assertTrue(MathUtil.areEqual(MathUtil.multiply(parentGlobalMatrix, childLocalMatrix), childGlobalMatrix, EPSILON));
+    }
+
+    @Test
     public void testSetParent0() {
         GameObject obj1 = new GameObject(GameObject.ROOT);
         GameObject obj2 = new GameObject(GameObject.ROOT);
@@ -121,7 +164,7 @@ public class GameObjectTest extends TestCase {
         double r = obj2.getGlobalRotation();
         double s = obj2.getGlobalScale();
         
-        assertEquals(0, p[0], EPSILON);
+         assertEquals(0, p[0], EPSILON);
         assertEquals(0, p[1], EPSILON);
         assertEquals(0, r, EPSILON);
         assertEquals(1, s, EPSILON);        

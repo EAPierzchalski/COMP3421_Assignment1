@@ -274,7 +274,7 @@ public class GameObject {
      */
     public double[] getGlobalPosition() {
         if (myParent == null) {
-            return myTranslation;
+            return new double[]{myTranslation[0], myTranslation[1]};
         } else {
             double[][] myTRSMatrix = MathUtil.TRSMatrix(myParent.getGlobalPosition(),
                     myParent.getGlobalRotation(),
@@ -329,13 +329,13 @@ public class GameObject {
         myParent = newParent;
         myParent.myChildren.add(this);
 
-        double[][] newParentToRoot = MathUtil.inverseTRSMatrix(newParent.getGlobalPosition(),
+        double[][] newParentInverse = MathUtil.inverseTRSMatrix(newParent.getGlobalPosition(),
                 newParent.getGlobalRotation(),
                 newParent.getScale());
 
-        double[][] rootToCurrent = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
+        double[][] currentGlobal = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
 
-        double[][] newParentToCurrent = MathUtil.multiply(rootToCurrent, newParentToRoot);
+        double[][] newParentToCurrent = MathUtil.multiply(newParentInverse, currentGlobal);
 
         myTranslation = MathUtil.translationComponent(newParentToCurrent);
         myScale = MathUtil.scaleComponent(newParentToCurrent);
