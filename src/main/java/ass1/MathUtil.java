@@ -141,7 +141,7 @@ public class MathUtil {
         transformations.add(translationMatrix(translation));
         transformations.add(rotationMatrix(rotation));
         transformations.add(scaleMatrix(scale));
-        return matrixProduct(transformations);
+        return rightMatrixProduct(transformations);
     }
 
     public static double[][] inverseTRSMatrix(double[] translation, double rotation, double scale) {
@@ -149,10 +149,10 @@ public class MathUtil {
         transformations.add(scaleMatrix(1/scale));
         transformations.add(rotationMatrix(-rotation));
         transformations.add(translationMatrix(new double[]{-translation[0], -translation[1]}));
-        return matrixProduct(transformations);
+        return rightMatrixProduct(transformations);
     }
 
-    public static double[][] matrixProduct(List<double[][]> matrices) {
+    public static double[][] rightMatrixProduct(List<double[][]> matrices) {
         double[][] m = identity();
         for (double[][] a : matrices) {
             m = multiply(m, a);
@@ -178,5 +178,26 @@ public class MathUtil {
             sumOfSquares += Math.pow(vi, 2);
         }
         return Math.pow(sumOfSquares, 0.5);
+    }
+
+    public static String printMatrix(double[][] m) {
+        StringBuilder matrixStringBuilder = new StringBuilder();
+        for (double[] row : m) {
+            StringBuilder rowStringBuilder = new StringBuilder();
+            for (double x : row) {
+                rowStringBuilder.append(String.format("%f ", x));
+            }
+            matrixStringBuilder.append(rowStringBuilder.toString());
+            matrixStringBuilder.append("\n");
+        }
+        return matrixStringBuilder.toString();
+    }
+
+    public static String printVector(double[] v) {
+        StringBuilder vectorStringBuilder = new StringBuilder();
+        for (double x: v) {
+            vectorStringBuilder.append(String.format("%f\n", x));
+        }
+        return vectorStringBuilder.toString();
     }
 }

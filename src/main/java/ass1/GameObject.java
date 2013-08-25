@@ -335,7 +335,7 @@ public class GameObject {
 
         double[][] rootToCurrent = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
 
-        double[][] newParentToCurrent = MathUtil.multiply(newParentToRoot, rootToCurrent);
+        double[][] newParentToCurrent = MathUtil.multiply(rootToCurrent, newParentToRoot);
 
         myTranslation = MathUtil.translationComponent(newParentToCurrent);
         myScale = MathUtil.scaleComponent(newParentToCurrent);

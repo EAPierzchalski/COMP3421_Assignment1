@@ -1,10 +1,8 @@
 package ass1.tests;
 
-import junit.framework.TestCase;
-
-import org.junit.Test;
-
 import ass1.MathUtil;
+import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * COMMENT: Comment MathUtilTest 
@@ -199,7 +197,7 @@ public class MathUtilTest extends TestCase {
     }
 
     @Test
-    public void testComponentExtracton() {
+    public void testComponentExtraction() {
         double[] translation = {2, 3};
         double rotation = 60;
         double scale = 3;
@@ -212,6 +210,45 @@ public class MathUtilTest extends TestCase {
         assertEquals(translation[1], translationComponent[1], EPSILON);
         assertEquals(rotation, rotationComponent, EPSILON);
         assertEquals(scale, scaleComponent, EPSILON);
+    }
+
+    @Test
+    public void testTransformations() {
+        double[] translation1 = {1, 3};
+        double rotation1 = 45;
+        double scale1 = 2;
+        double[] translation2 = {-2, 0};
+        double rotation2 = -45;
+        double scale2 = 3;
+
+        double[][] matrixTRSRootToC1 = MathUtil.TRSMatrix(translation1, rotation1, scale1);
+        double[][] matrixTRSRootToC2 = MathUtil.TRSMatrix(translation2, rotation2, scale2);
+        double[][] invTRSC2ToRoot = MathUtil.inverseTRSMatrix(translation2, rotation2, scale2);
+
+        double[][] matrixTRSC2ToC1 = MathUtil.multiply(matrixTRSRootToC1, invTRSC2ToRoot);
+
+        System.out.println("Matrix from Root to Coordinate System 1:");
+        System.out.println(MathUtil.printMatrix(matrixTRSRootToC1));
+
+        System.out.println("Matrix from Root to Coordinate System 2:");
+        System.out.println(MathUtil.printMatrix(matrixTRSRootToC2));
+
+        System.out.println("\nMatrix from Coordinate System 2 to Root:");
+        System.out.println(MathUtil.printMatrix(invTRSC2ToRoot));
+
+        System.out.println("\nMatrix from Coordinate System 2 to Coordinate System 1:");
+        System.out.println(MathUtil.printMatrix(matrixTRSC2ToC1));
+
+        double[] translationComponent = MathUtil.translationComponent(matrixTRSC2ToC1);
+        double rotationComponent = MathUtil.rotationComponent(matrixTRSC2ToC1);
+        double scaleComponent = MathUtil.scaleComponent(matrixTRSC2ToC1);
+
+
+
+        assertEquals(0, translationComponent[0], EPSILON);
+        assertEquals(2.0/Math.sqrt(3), translationComponent[1], EPSILON);
+        assertEquals(90, rotationComponent, EPSILON);
+        assertEquals(2.0/3.0, scaleComponent, EPSILON);
     }
 
 }
