@@ -325,21 +325,21 @@ public class GameObject {
      */
     public void setParent(GameObject newParent) {
 
-        myParent.myChildren.remove(this);
-        myParent = newParent;
-        myParent.myChildren.add(this);
-
-        double[][] newParentInverse = MathUtil.inverseTRSMatrix(newParent.getGlobalPosition(),
+        double[][] parent2Root = MathUtil.inverseTRSMatrix(newParent.getGlobalPosition(),
                 newParent.getGlobalRotation(),
                 newParent.getScale());
 
-        double[][] currentGlobal = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
+        double[][] root2Me = MathUtil.TRSMatrix(getGlobalPosition(), getGlobalRotation(), getGlobalScale());
 
-        double[][] newParentToCurrent = MathUtil.multiply(newParentInverse, currentGlobal);
+        double[][] newParentToCurrent = MathUtil.multiply(parent2Root, root2Me);
 
         myTranslation = MathUtil.translationComponent(newParentToCurrent);
         myScale = MathUtil.scaleComponent(newParentToCurrent);
         myRotation = MathUtil.rotationComponent(newParentToCurrent);
+
+        myParent.myChildren.remove(this);
+        myParent = newParent;
+        myParent.myChildren.add(this);
 
     }
     

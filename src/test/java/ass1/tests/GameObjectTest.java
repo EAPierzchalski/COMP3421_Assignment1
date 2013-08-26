@@ -164,7 +164,7 @@ public class GameObjectTest extends TestCase {
         double r = obj2.getGlobalRotation();
         double s = obj2.getGlobalScale();
         
-         assertEquals(0, p[0], EPSILON);
+        assertEquals(0, p[0], EPSILON);
         assertEquals(0, p[1], EPSILON);
         assertEquals(0, r, EPSILON);
         assertEquals(1, s, EPSILON);        
