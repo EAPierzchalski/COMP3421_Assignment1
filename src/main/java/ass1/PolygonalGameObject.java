@@ -1,5 +1,6 @@
 package ass1;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 /**
@@ -116,6 +117,23 @@ public class PolygonalGameObject extends GameObject {
     public void drawSelf(GL2 gl) {
 
         // TODO: Write this method
+        double[][] myPointsAsPairs = new double[myPoints.length/2][2];
+        for (int i = 0; i < myPoints.length; i++) {
+            myPointsAsPairs[i / 2][i % 2] = myPoints[i];
+        }
+
+        int polygonOptions = 0;
+        if (myFillColour != null) {
+            polygonOptions |= GL2.GL_FILL;
+        }
+        if (myLineColour != null) {
+            polygonOptions |= GL2.GL_LINE;
+        }
+
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, polygonOptions);
+        gl.glBegin(GL2.GL_POLYGON); {
+
+        } gl.glEnd();
 
     }
 

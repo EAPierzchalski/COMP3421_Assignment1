@@ -262,6 +262,17 @@ public class GameObject {
         // setting the model transform appropriately 
     
         // Call drawSelf() to draw the object itself
+        gl.glMatrixMode(GL2.GL_MODELVIEW); {
+            gl.glPushMatrix(); {
+                gl.glTranslated(myTranslation[0], myTranslation[1], 0);
+                gl.glScaled(myScale, myScale, 1);
+                gl.glRotated(myRotation, 0, 0, 1);
+                drawSelf(gl);
+                for (GameObject child : myChildren) {
+                    child.draw(gl);
+                }
+            } gl.glPopMatrix();
+        }
         
     }
 
