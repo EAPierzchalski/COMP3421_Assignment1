@@ -1,6 +1,5 @@
 package ass1;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 /**
@@ -111,31 +110,33 @@ public class PolygonalGameObject extends GameObject {
      * if the fill colour is non-null, fill the polygon with this colour
      * if the line colour is non-null, draw the outline with this colour
      * 
-     * @see ass1.spec.GameObject#drawSelf(javax.media.opengl.GL2)
+     * @.media.opengl.GL2)
      */
     @Override
     public void drawSelf(GL2 gl) {
 
         // TODO: Write this method
-        double[][] myPointsAsPairs = new double[myPoints.length/2][2];
-        for (int i = 0; i < myPoints.length; i++) {
-            myPointsAsPairs[i / 2][i % 2] = myPoints[i];
-        }
-
-        int polygonOptions = 0;
         if (myFillColour != null) {
-            polygonOptions |= GL2.GL_FILL;
+            gl.glColor4dv(myFillColour, 0);
+            gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
+            drawMyPolygon(gl);
         }
+
         if (myLineColour != null) {
-            polygonOptions |= GL2.GL_LINE;
+            gl.glColor4dv(myLineColour, 0);
+            gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
+            gl.glEnable(GL2.GL_POLYGON_OFFSET_LINE);
+            gl.glPolygonOffset(-1, -1);
+            drawMyPolygon(gl);
         }
-
-        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, polygonOptions);
-        gl.glBegin(GL2.GL_POLYGON); {
-
-        } gl.glEnd();
-
     }
 
+    private void drawMyPolygon(GL2 gl) {
+        gl.glBegin(GL2.GL_POLYGON); {
+            for (int i = 0; i < myPoints.length; i ++) {
+                gl.glVertex2dv(myPoints, i);
+            }
+        } gl.glEnd();
+    }
 
 }
