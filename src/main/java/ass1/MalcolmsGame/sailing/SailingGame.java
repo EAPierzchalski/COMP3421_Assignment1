@@ -26,7 +26,7 @@ public class SailingGame extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private static final float[] WATER_COLOR = { 0.0f, 0.0f, 1.0f, 0.0f };
-    private static final String MAP_FILE = "C:\\Users\\Edward\\IdeaProjects\\COMP3421_Assignment1\\src\\main\\java\\ass1\\MalcolmsGame\\map.json";
+    private static final String MAP_FILE = "map.json";
 
     private Map myMap;
     private GLJPanel myPanel;
@@ -43,6 +43,8 @@ public class SailingGame extends JFrame {
         glcapabilities.setSampleBuffers(true);
         glcapabilities.setNumSamples(4);
         myPanel = new GLJPanel(glcapabilities);
+
+        //System.out.println(System.getProperty("user.dir"));
 
         readMap(new File(MAP_FILE));
 
