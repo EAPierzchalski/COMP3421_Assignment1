@@ -1,11 +1,11 @@
 package ass1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The GameEngine is the GLEventListener for our game.
@@ -73,7 +73,7 @@ public class GameEngine implements GLEventListener {
         update();
 
         // draw the scene tree
-        GameObject.ROOT.draw(gl);        
+        GameObject.ROOT.draw(gl);
     }
 
     private void update() {
@@ -91,6 +91,23 @@ public class GameEngine implements GLEventListener {
         for (GameObject g : objects) {
             g.update(dt);
         }        
+    }
+
+    public List<GameObject> collision(double[] p) {
+        List<GameObject> collisions = new LinkedList<GameObject>();
+        for (GameObject gameObject : GameObject.ALL_OBJECTS) {
+            if (gameObject instanceof PolygonalGameObject) {
+                PolygonalGameObject polygonalGameObject = (PolygonalGameObject) gameObject;
+                if (collides(p, polygonalGameObject.getPoints())) {
+                    collisions.add(polygonalGameObject);
+                }
+            }
+        }
+        return collisions;
+    }
+
+    private boolean collides(double[] testPoint, double[] polygonPoints) {
+        return true;
     }
 
 }
