@@ -106,8 +106,72 @@ public class GameEngine implements GLEventListener {
         return collisions;
     }
 
-    private boolean collides(double[] testPoint, double[] polygonPoints) {
-        return true;
+    private static boolean collides(double[] testPoint, double[] polygonPoints) {
+        int intersectionCount = 0;
+        for (int pointIndex = 0; pointIndex < polygonPoints.length/2; pointIndex++) {
+            int startIndex = 2 * pointIndex;
+            double xStart = polygonPoints[startIndex];
+            double yStart = polygonPoints[startIndex + 1];
+            int endIndex = 2 * pointIndex % polygonPoints.length;
+            double xEnd = polygonPoints[endIndex];
+            double yEnd = polygonPoints[endIndex + 1];
+            int sideOfLine = whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd);
+            if (sideOfLine == 0) {
+                //if we lie on the line, we are in the polygon if our coordinates lie on the line segment
+                boolean inXRange = (xEnd <= testPoint[0] && testPoint[0] <= xStart) ||
+                        (xStart <= testPoint[0] && testPoint[0] <= xEnd);
+                boolean inYRange = (yEnd <= testPoint[1] && testPoint[1] <= yStart) ||
+                        (yStart <= testPoint[1] && testPoint[1] <= yEnd);
+                return inXRange && inYRange;
+            }
+            intersectionCount += numIntersections(testPoint, xStart, yStart, xEnd, yEnd, sideOfLine);
+        }
+        return intersectionCount % 2 == 1;
+    }
+
+    /***
+     *
+     * @param testPoint array containing the points {x, y}
+     * @param xStart x-coordinate of the start of the line segment
+     * @param yStart y-coordinate of the start of the line segment
+     * @param xEnd x-coordinate of the end of the line segment
+     * @param yEnd y-coordinate of the end of the line segment
+     * @param sideOfLine -1 if the point is to the left of the line, 0 if the point is on the line, 1 if the point is to the right of the line
+     * @return the number of intersections between the half-line from testPoint to the right, and the line through Start and End.
+     */
+    private static int numIntersections(double[] testPoint, double xStart, double yStart, double xEnd, double yEnd, int sideOfLine) {
+        //we only call numIntersections if the point does not lie _on_ the line segment, and so we know the point
+        //does not intersect the line at all if it is horizontal.
+        if (yStart - yEnd == 0) {
+            return 0;
+        } else {
+            if (sideOfLine == 1) {
+                //if we lie to the right of the line there are no intersections
+                return 0;
+            } else {
+                return (xEnd <= testPoint[0] && testPoint[0] < xStart) ||
+                        (xStart <= testPoint[0] && testPoint[0] < xEnd) ? 1 : 0 ;
+            }
+        }
+    }
+
+    /***
+     *
+     * @param testPoint array containing the points {x, y}
+     * @param x1    x-coordinate of point p1 on line
+     * @param y1    y-coordinate of point p1 on line
+     * @param x2  x-coordinate of point p2 on line
+     * @param y2  y-coordinate of point p2 on line
+     * @return -1 if the point is to the left of the line, 0 if the point lies on the line, 1 if the point is to the right of the line.
+     */
+    private static int whatSideOfLine(double[] testPoint, double x1, double y1, double x2, double y2) {
+        double dx1 = testPoint[1] - Math.max(x1, x2);
+        double dx2 = testPoint[1] - Math.min(x1, x2);
+        double dy1 = testPoint[2] - Math.max(y1, y2);
+        double dy2 = testPoint[2] - Math.min(y1, y2);
+        double d = dx1 * dy2 - dy1 * dx2;
+        return  d < 0 ? -1 :
+                d > 0 ?  1 : 0;
     }
 
 }
