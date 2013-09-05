@@ -1,5 +1,7 @@
 package ass1;
 
+import org.junit.Assert;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -18,6 +20,8 @@ import java.util.List;
  * @author malcolmr
  */
 public class GameEngine implements GLEventListener {
+
+    private static double COLLISION_EPSILON = 1e-10;
 
     private Camera myCamera;
     private long myTime;
@@ -98,7 +102,21 @@ public class GameEngine implements GLEventListener {
         for (GameObject gameObject : GameObject.ALL_OBJECTS) {
             if (gameObject instanceof PolygonalGameObject) {
                 PolygonalGameObject polygonalGameObject = (PolygonalGameObject) gameObject;
-                if (collides(p, polygonalGameObject.getPoints())) {
+                double[] localPolygonPoints = polygonalGameObject.getPoints();
+                double[] globalPolygonPoints = new double[localPolygonPoints.length];
+                double[] globalPosition = polygonalGameObject.getGlobalPosition();
+                double globalRotation = polygonalGameObject.getGlobalRotation();
+                double globalScale = polygonalGameObject.getGlobalScale();
+                double[][] transformationMatrix = MathUtil.TRSMatrix(globalPosition, globalRotation, globalScale);
+                for (int pointIndex = 0; pointIndex < localPolygonPoints.length/2; pointIndex++) {
+                    double[] localVertex = new double[]{localPolygonPoints[2 * pointIndex],
+                            localPolygonPoints[2 * pointIndex + 1],
+                            1};
+                    double[] globalVertex = MathUtil.multiply(transformationMatrix, localVertex);
+                    globalPolygonPoints[2 * pointIndex] = globalVertex[0];
+                    globalPolygonPoints[2 * pointIndex + 1] = globalVertex[1];
+                }
+                if (collides(p, globalPolygonPoints)) {
                     collisions.add(polygonalGameObject);
                 }
             }
@@ -112,47 +130,33 @@ public class GameEngine implements GLEventListener {
             int startIndex = 2 * pointIndex;
             double xStart = polygonPoints[startIndex];
             double yStart = polygonPoints[startIndex + 1];
-            int endIndex = 2 * pointIndex % polygonPoints.length;
+            int endIndex = (2 * (pointIndex + 1)) % polygonPoints.length;
             double xEnd = polygonPoints[endIndex];
             double yEnd = polygonPoints[endIndex + 1];
             int sideOfLine = whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd);
+            //System.out.println(String.format("x: %f, y: %f", testPoint[0], testPoint[1]));
+            //System.out.println(String.format("xStart: %f, yStart: %f", xStart, yStart));
+            //System.out.println(String.format("xEnd: %f, yEnd: %f", xEnd, yEnd));
+            //System.out.println(String.format("Side of line: %d", whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd)));
+            //System.out.println(String.format("In x bounds: %b", inRange(testPoint[0], xStart, xEnd, false)));
+            //System.out.println(String.format("In y bounds: %b", inRange(testPoint[1], yStart, yEnd, true)));
             if (sideOfLine == 0) {
-                //if we lie on the line, we are in the polygon if our coordinates lie on the line segment
-                boolean inXRange = (xEnd <= testPoint[0] && testPoint[0] <= xStart) ||
-                        (xStart <= testPoint[0] && testPoint[0] <= xEnd);
-                boolean inYRange = (yEnd <= testPoint[1] && testPoint[1] <= yStart) ||
-                        (yStart <= testPoint[1] && testPoint[1] <= yEnd);
-                return inXRange && inYRange;
+                if (inRange(testPoint[0], xStart, xEnd, false) &&
+                        inRange(testPoint[1], yStart, yEnd, false)) {
+                    return true;
+                }
+            } else if (sideOfLine == -1) {
+                if (inRange(testPoint[1], yStart, yEnd, true)) {
+                    intersectionCount += 1;
+                }
             }
-            intersectionCount += numIntersections(testPoint, xStart, yStart, xEnd, yEnd, sideOfLine);
         }
         return intersectionCount % 2 == 1;
     }
 
-    /***
-     *
-     * @param testPoint array containing the points {x, y}
-     * @param xStart x-coordinate of the start of the line segment
-     * @param yStart y-coordinate of the start of the line segment
-     * @param xEnd x-coordinate of the end of the line segment
-     * @param yEnd y-coordinate of the end of the line segment
-     * @param sideOfLine -1 if the point is to the left of the line, 0 if the point is on the line, 1 if the point is to the right of the line
-     * @return the number of intersections between the half-line from testPoint to the right, and the line through Start and End.
-     */
-    private static int numIntersections(double[] testPoint, double xStart, double yStart, double xEnd, double yEnd, int sideOfLine) {
-        //we only call numIntersections if the point does not lie _on_ the line segment, and so we know the point
-        //does not intersect the line at all if it is horizontal.
-        if (yStart - yEnd == 0) {
-            return 0;
-        } else {
-            if (sideOfLine == 1) {
-                //if we lie to the right of the line there are no intersections
-                return 0;
-            } else {
-                return (xEnd <= testPoint[0] && testPoint[0] < xStart) ||
-                        (xStart <= testPoint[0] && testPoint[0] < xEnd) ? 1 : 0 ;
-            }
-        }
+    private static boolean inRange(double testPointX, double x1, double x2, boolean strongUpperBound) {
+        return Math.min(x1, x2) <= testPointX &&
+                (strongUpperBound ? testPointX < Math.max(x1, x2) : testPointX <= Math.max(x1, x2));
     }
 
     /***
@@ -165,13 +169,14 @@ public class GameEngine implements GLEventListener {
      * @return -1 if the point is to the left of the line, 0 if the point lies on the line, 1 if the point is to the right of the line.
      */
     private static int whatSideOfLine(double[] testPoint, double x1, double y1, double x2, double y2) {
-        double dx1 = testPoint[1] - Math.max(x1, x2);
-        double dx2 = testPoint[1] - Math.min(x1, x2);
-        double dy1 = testPoint[2] - Math.max(y1, y2);
-        double dy2 = testPoint[2] - Math.min(y1, y2);
-        double d = dx1 * dy2 - dy1 * dx2;
-        return  d < 0 ? -1 :
-                d > 0 ?  1 : 0;
+        double dx1 = testPoint[0] - Math.max(x1, x2);
+        double dx2 = testPoint[0] - Math.min(x1, x2);
+        double dy1 = testPoint[1] - Math.max(y1, y2);
+        double dy2 = testPoint[1] - Math.min(y1, y2);
+        double d12 = dx1 * dy2;
+        double d21 = dy1 * dx2;
+        return  d12 < d21 && Math.abs(d12 - d21) > COLLISION_EPSILON ? -1 :
+                d12 > d21 && Math.abs(d12 - d21) > COLLISION_EPSILON ?  1 : 0;
     }
 
 }
