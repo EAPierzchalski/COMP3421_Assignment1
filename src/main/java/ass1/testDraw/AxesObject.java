@@ -1,17 +1,16 @@
 package ass1.testDraw;
 
-import java.awt.BorderLayout;
+import ass1.Camera;
+import ass1.GameEngine;
+import ass1.GameObject;
+import com.jogamp.opengl.util.FPSAnimator;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
-import javax.swing.JFrame;
-
-import ass1.Camera;
-import ass1.GameEngine;
-import ass1.GameObject;
-import com.jogamp.opengl.util.FPSAnimator;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A simple axes object for debugging the assignment.
@@ -86,6 +85,23 @@ public class AxesObject extends GameObject {
         axesChild.setPosition(-2, -1);
         axesChild.setRotation(-90);
         axesChild.setScale(2);
+
+        // A new set of axes from axesParent
+        AxesObject axesChild2 = new AxesObject(axesParent);
+        axesChild2.setPosition(-Math.sqrt(2), 0);
+        axesChild2.rotate(90);
+        axesChild2.scale(Math.sqrt(2));
+
+        axesChild2.setParent(axesChild);
+
+        AxesObject axesParent2 = new AxesObject(GameObject.ROOT);
+        axesParent2.setPosition(-1, -1);
+        axesParent2.rotate(-45);
+        axesParent2.scale(1d/Math.sqrt(2));
+
+        axesChild2.setParent(axesParent2);
+
+        axesParent2.setParent(axesParent);
         
         // Add the game engine
         GameEngine engine = new GameEngine(camera);
@@ -101,7 +117,7 @@ public class AxesObject extends GameObject {
         jFrame.getContentPane().add(panel, BorderLayout.CENTER);
         jFrame.setSize(400, 400);
         jFrame.setVisible(true);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
 }

@@ -1,8 +1,5 @@
 package ass1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A collection of useful math methods 
  *
@@ -93,7 +90,7 @@ public class MathUtil {
      * @return
      */
     public static double[][] translationMatrix(double[] pos) {
-        double[][] t = identity();
+        double[][] t = getIdentity();
         t[0][2] = pos[0];
         t[1][2] = pos[1];
         return t;
@@ -109,7 +106,7 @@ public class MathUtil {
         double radians = Math.toRadians(angle);
         double s = Math.sin(radians);
         double c = Math.cos(radians);
-        double[][] r = identity();
+        double[][] r = getIdentity();
         r[0][0] = c;
         r[0][1] = -s;
         r[1][0] = s;
@@ -124,52 +121,36 @@ public class MathUtil {
      * @return
      */
     public static double[][] scaleMatrix(double scale) {
-        double[][] s = identity();
+        double[][] s = getIdentity();
         s[0][0] = scale;
         s[1][1] = scale;
         return s;
     }
 
-    public static double[][] identity() {
-        return new double[][]{{1, 0, 0},
-                {0, 1, 0},
-                {0, 0, 1}};
-    }
-
-    public static double[][] TRSMatrix(double[] translation, double rotation, double scale) {
-        List<double[][]> transformations = new ArrayList<double[][]>(3);
-        transformations.add(translationMatrix(translation));
-        transformations.add(rotationMatrix(rotation));
-        transformations.add(scaleMatrix(scale));
-        return rightMatrixProduct(transformations);
-    }
-
-    public static double[][] inverseTRSMatrix(double[] translation, double rotation, double scale) {
-        List<double[][]> transformations = new ArrayList<double[][]>(3);
-        transformations.add(scaleMatrix(1/scale));
-        transformations.add(rotationMatrix(-rotation));
-        transformations.add(translationMatrix(new double[]{-translation[0], -translation[1]}));
-        return rightMatrixProduct(transformations);
-    }
-
-    public static double[][] rightMatrixProduct(List<double[][]> matrices) {
-        double[][] m = identity();
-        for (double[][] a : matrices) {
-            m = multiply(m, a);
-        }
-        return m;
+    public static double[][] getIdentity() {
+        return new double[][]
+                {{1, 0, 0},
+                 {0, 1, 0},
+                 {0, 0, 1}};
     }
 
     public static double[] translationComponent(double[][] matrix) {
-        return new double[]{matrix[0][2], matrix[1][2]};
+        double[] translation = new double[2];
+        translation[0] = matrix[0][2];
+        translation[1] = matrix[1][2];
+        return translation;
     }
 
     public static double scaleComponent(double[][] matrix) {
-        return norm(new double[]{matrix[0][0], matrix[1][0]});
+        double[] v = new double[2];
+        v[0] = matrix[0][0];
+        v[1] = matrix[1][0];
+        return norm(v);
     }
 
     public static double rotationComponent(double[][] matrix) {
-        return normaliseAngle(Math.toDegrees(Math.atan2(matrix[1][0], matrix[0][0])));
+        double angleInRadians = Math.atan2(matrix[1][0], matrix[0][0]);
+        return normaliseAngle(Math.toDegrees(angleInRadians));
     }
 
     public static double norm(double[] v) {

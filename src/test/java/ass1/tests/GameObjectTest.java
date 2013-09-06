@@ -128,15 +128,9 @@ public class GameObjectTest extends TestCase {
 
         //The meat and potatoes: checking that composing the transformation from the parent's global space to the
         //child's local one is the same as taking the child's global transform.
-        double[][] parentGlobalMatrix = MathUtil.TRSMatrix(parent.getGlobalPosition(),
-                parent.getGlobalRotation(),
-                parent.getGlobalScale());
-        double[][] childGlobalMatrix = MathUtil.TRSMatrix(child.getGlobalPosition(),
-                child.getGlobalRotation(),
-                child.getGlobalScale());
-        double[][] childLocalMatrix = MathUtil.TRSMatrix(child.getPosition(),
-                child.getRotation(),
-                child.getScale());
+        double[][] parentGlobalMatrix = parent.getGlobalMatrix();
+        double[][] childGlobalMatrix = child.getGlobalMatrix();
+        double[][] childLocalMatrix = child.getLocalMatrix();
 
         assertTrue(MathUtil.areEqual(MathUtil.multiply(parentGlobalMatrix, childLocalMatrix), childGlobalMatrix, EPSILON));
     }

@@ -137,4 +137,21 @@ public class PolygonalGameObject extends GameObject {
         } gl.glEnd();
     }
 
+    public double[] getGlobalPoints() {
+        double[] globalCoordinates = new double[myPoints.length];
+        double[][] myGlobalTransformationMatrix = this.getGlobalMatrix();
+        for (int pointIndex = 0; pointIndex < myPoints.length/2; pointIndex++) {
+            int xIndex = 2 * pointIndex;
+            int yIndex = xIndex + 1;
+            double[] localVertexPoint = new double[3];
+            localVertexPoint[0] = myPoints[xIndex];
+            localVertexPoint[1] = myPoints[yIndex];
+            localVertexPoint[2] = 1;
+            double[] globalVertexPoint = MathUtil.multiply(myGlobalTransformationMatrix, localVertexPoint);
+            globalCoordinates[xIndex] = globalVertexPoint[0];
+            globalCoordinates[yIndex] = globalVertexPoint[1];
+        }
+        return globalCoordinates;
+    }
+
 }

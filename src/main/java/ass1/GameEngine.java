@@ -1,7 +1,5 @@
 package ass1;
 
-import org.junit.Assert;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -102,21 +100,8 @@ public class GameEngine implements GLEventListener {
         for (GameObject gameObject : GameObject.ALL_OBJECTS) {
             if (gameObject instanceof PolygonalGameObject) {
                 PolygonalGameObject polygonalGameObject = (PolygonalGameObject) gameObject;
-                double[] localPolygonPoints = polygonalGameObject.getPoints();
-                double[] globalPolygonPoints = new double[localPolygonPoints.length];
-                double[] globalPosition = polygonalGameObject.getGlobalPosition();
-                double globalRotation = polygonalGameObject.getGlobalRotation();
-                double globalScale = polygonalGameObject.getGlobalScale();
-                double[][] transformationMatrix = MathUtil.TRSMatrix(globalPosition, globalRotation, globalScale);
-                for (int pointIndex = 0; pointIndex < localPolygonPoints.length/2; pointIndex++) {
-                    double[] localVertex = new double[]{localPolygonPoints[2 * pointIndex],
-                            localPolygonPoints[2 * pointIndex + 1],
-                            1};
-                    double[] globalVertex = MathUtil.multiply(transformationMatrix, localVertex);
-                    globalPolygonPoints[2 * pointIndex] = globalVertex[0];
-                    globalPolygonPoints[2 * pointIndex + 1] = globalVertex[1];
-                }
-                if (collides(p, globalPolygonPoints)) {
+                double[] globalPolygonCoordinates = polygonalGameObject.getGlobalPoints();
+                if (collides(p, globalPolygonCoordinates)) {
                     collisions.add(polygonalGameObject);
                 }
             }
@@ -124,26 +109,21 @@ public class GameEngine implements GLEventListener {
         return collisions;
     }
 
-    private static boolean collides(double[] testPoint, double[] polygonPoints) {
+    private static boolean collides(double[] testPoint, double[] polygonCoordinates) {
         int intersectionCount = 0;
-        for (int pointIndex = 0; pointIndex < polygonPoints.length/2; pointIndex++) {
+        boolean onAnEdge = false;
+        for (int pointIndex = 0; pointIndex < polygonCoordinates.length/2 && !onAnEdge; pointIndex++) {
             int startIndex = 2 * pointIndex;
-            double xStart = polygonPoints[startIndex];
-            double yStart = polygonPoints[startIndex + 1];
-            int endIndex = (2 * (pointIndex + 1)) % polygonPoints.length;
-            double xEnd = polygonPoints[endIndex];
-            double yEnd = polygonPoints[endIndex + 1];
+            double xStart = polygonCoordinates[startIndex];
+            double yStart = polygonCoordinates[startIndex + 1];
+            int endIndex = (2 * (pointIndex + 1)) % polygonCoordinates.length;
+            double xEnd = polygonCoordinates[endIndex];
+            double yEnd = polygonCoordinates[endIndex + 1];
             int sideOfLine = whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd);
-            //System.out.println(String.format("x: %f, y: %f", testPoint[0], testPoint[1]));
-            //System.out.println(String.format("xStart: %f, yStart: %f", xStart, yStart));
-            //System.out.println(String.format("xEnd: %f, yEnd: %f", xEnd, yEnd));
-            //System.out.println(String.format("Side of line: %d", whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd)));
-            //System.out.println(String.format("In x bounds: %b", inRange(testPoint[0], xStart, xEnd, false)));
-            //System.out.println(String.format("In y bounds: %b", inRange(testPoint[1], yStart, yEnd, true)));
             if (sideOfLine == 0) {
                 if (inRange(testPoint[0], xStart, xEnd, false) &&
                         inRange(testPoint[1], yStart, yEnd, false)) {
-                    return true;
+                    onAnEdge = true;
                 }
             } else if (sideOfLine == -1) {
                 if (inRange(testPoint[1], yStart, yEnd, true)) {
@@ -151,7 +131,11 @@ public class GameEngine implements GLEventListener {
                 }
             }
         }
-        return intersectionCount % 2 == 1;
+        boolean collides = false;
+        if (onAnEdge || intersectionCount % 2 == 1) {
+            collides = true;
+        }
+        return collides;
     }
 
     private static boolean inRange(double testPointX, double x1, double x2, boolean strongUpperBound) {
