@@ -130,7 +130,14 @@ public class GameObjectTest extends TestCase {
         //child's local one is the same as taking the child's global transform.
         double[][] parentGlobalMatrix = parent.getGlobalMatrix();
         double[][] childGlobalMatrix = child.getGlobalMatrix();
-        double[][] childLocalMatrix = child.getLocalMatrix();
+        double[][] childLocalMatrix = MathUtil.getIdentity();
+
+        double[][] childLocalTranslationMatrix = MathUtil.translationMatrix(child.getPosition());
+        double[][] childLocalRotationMatrix = MathUtil.rotationMatrix(child.getRotation());
+        double[][] childLocalScaleMatrix = MathUtil.scaleMatrix(child.getScale());
+        childLocalMatrix = MathUtil.multiply(childLocalMatrix, childLocalTranslationMatrix);
+        childLocalMatrix = MathUtil.multiply(childLocalMatrix, childLocalRotationMatrix);
+        childLocalMatrix = MathUtil.multiply(childLocalMatrix, childLocalScaleMatrix);
 
         assertTrue(MathUtil.areEqual(MathUtil.multiply(parentGlobalMatrix, childLocalMatrix), childGlobalMatrix, EPSILON));
     }

@@ -103,6 +103,8 @@ public class CollisionTest {
         expectCollisionWith(gameEngine, -3, 0.5, square);
         expectCollisionWith(gameEngine, -3, 2, square);
         expectCollisionWith(gameEngine, -2, 1, square);
+        expectCollisionWith(gameEngine, -3.99, 1, square);
+        expectCollisionWith(gameEngine, -4, 1, square);
         expectCollisionWith(gameEngine, -2.5, 0.5, square);
         expectCollisionWith(gameEngine, -3.5, 0.5, square);
         expectCollisionWith(gameEngine, -3, 0, square);

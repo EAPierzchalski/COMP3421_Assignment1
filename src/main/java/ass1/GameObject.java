@@ -348,7 +348,7 @@ public class GameObject {
         GameObject oldParent = this.myParent;
 
         double oldLocalRotation = this.getRotation();
-        double newLocalRotation = oldParent.getGlobalRotation() - newParent.getGlobalRotation() + oldLocalRotation;
+        double newLocalRotation = MathUtil.normaliseAngle(oldParent.getGlobalRotation() - newParent.getGlobalRotation() + oldLocalRotation);
 
         double oldLocalScale = this.getScale();
         double newLocalScale = oldParent.getGlobalScale() * oldLocalScale / newParent.getGlobalScale();
@@ -409,25 +409,6 @@ public class GameObject {
         m = MathUtil.multiply(m, myInverseGlobalScaleMatrix);
         m = MathUtil.multiply(m, myInverseGlobalRotationMatrix);
         m = MathUtil.multiply(m, myInverseGlobalTranslationMatrix);
-        return m;
-    }
-
-    public double[][] getLocalMatrix() {
-        double[][] m = MathUtil.getIdentity();
-        m = MathUtil.multiply(m, MathUtil.translationMatrix(this.myTranslation));
-        m = MathUtil.multiply(m, MathUtil.rotationMatrix(this.myRotation));
-        m = MathUtil.multiply(m, MathUtil.scaleMatrix(this.myScale));
-        return m;
-    }
-
-    public double[][] getInverseLocalMatrix() {
-        double[] inverseTranslation = new double[2];
-        inverseTranslation[0] = -myTranslation[0];
-        inverseTranslation[1] = -myTranslation[1];
-        double[][] m = MathUtil.getIdentity();
-        MathUtil.multiply(m, MathUtil.scaleMatrix(1.0/this.myScale));
-        MathUtil.multiply(m, MathUtil.rotationMatrix(-this.myRotation));
-        MathUtil.multiply(m, MathUtil.translationMatrix(inverseTranslation));
         return m;
     }
 
