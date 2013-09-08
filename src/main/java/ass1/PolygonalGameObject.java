@@ -127,6 +127,8 @@ public class PolygonalGameObject extends GameObject {
             gl.glLineWidth(1f);
             drawMyPolygon(gl, GL2.GL_POLYGON);
         }
+        //Some drivers are in fact the devil, and will hate you if you leave the polygon draw mode as anything other
+        //than GL_FILL.
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
     }
 
