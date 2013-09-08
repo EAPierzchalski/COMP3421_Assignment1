@@ -112,6 +112,7 @@ public class GameEngine implements GLEventListener {
     private static boolean collides(double[] testPoint, double[] polygonCoordinates) {
         int intersectionCount = 0;
         boolean onAnEdge = false;
+        //System.out.println(String.format("\ntestPoint:  {%f, %f}", testPoint[0], testPoint[1]));
         for (int pointIndex = 0; pointIndex < polygonCoordinates.length/2 && !onAnEdge; pointIndex++) {
             int startIndex = 2 * pointIndex;
             double xStart = polygonCoordinates[startIndex];
@@ -120,6 +121,11 @@ public class GameEngine implements GLEventListener {
             double xEnd = polygonCoordinates[endIndex];
             double yEnd = polygonCoordinates[endIndex + 1];
             int sideOfLine = whatSideOfLine(testPoint, xStart, yStart, xEnd, yEnd);
+            //double distanceFromLine = distanceFromLine(testPoint, xStart, yStart, xEnd, yEnd);
+            //System.out.println(String.format("edge start: {%f, %f}", xStart, yStart));
+            //System.out.println(String.format("edge end:   {%f, %f}", xEnd, yEnd));
+            //System.out.println(String.format("Side of line: %d", sideOfLine));
+            //System.out.println(String.format("distance from line: %f", distanceFromLine));
             if (sideOfLine == 0) {
                 if (inRange(testPoint[0], xStart, xEnd, false) &&
                         inRange(testPoint[1], yStart, yEnd, false)) {
@@ -128,6 +134,7 @@ public class GameEngine implements GLEventListener {
             } else if (sideOfLine == -1) {
                 if (inRange(testPoint[1], yStart, yEnd, true)) {
                     intersectionCount += 1;
+                    //System.out.println("  Collision!");
                 }
             }
         }
@@ -138,9 +145,17 @@ public class GameEngine implements GLEventListener {
         return collides;
     }
 
-    private static boolean inRange(double testPointX, double x1, double x2, boolean strongUpperBound) {
-        return Math.min(x1, x2) <= testPointX &&
-                (strongUpperBound ? testPointX < Math.max(x1, x2) : testPointX <= Math.max(x1, x2));
+    private static boolean inRange(double testVal, double boundVal1, double boundVal2, boolean strongUpperBound) {
+        double upperBound = Math.max(boundVal1, boundVal2);
+        double lowerBound = Math.min(boundVal1, boundVal2);
+        boolean aboveLowerBound = lowerBound - COLLISION_EPSILON <= testVal;
+        boolean belowUpperBound;
+        if (strongUpperBound) {
+            belowUpperBound = testVal < upperBound;
+        } else {
+            belowUpperBound = testVal <= upperBound + COLLISION_EPSILON;
+        }
+        return aboveLowerBound && belowUpperBound;
     }
 
     /***
@@ -153,14 +168,39 @@ public class GameEngine implements GLEventListener {
      * @return -1 if the point is to the left of the line, 0 if the point lies on the line, 1 if the point is to the right of the line.
      */
     private static int whatSideOfLine(double[] testPoint, double x1, double y1, double x2, double y2) {
-        double dx1 = testPoint[0] - Math.max(x1, x2);
-        double dx2 = testPoint[0] - Math.min(x1, x2);
-        double dy1 = testPoint[1] - Math.max(y1, y2);
-        double dy2 = testPoint[1] - Math.min(y1, y2);
-        double d12 = dx1 * dy2;
-        double d21 = dy1 * dx2;
-        return  d12 < d21 && Math.abs(d12 - d21) > COLLISION_EPSILON ? -1 :
-                d12 > d21 && Math.abs(d12 - d21) > COLLISION_EPSILON ?  1 : 0;
+        double[] lowPoint;
+        double[] highPoint;
+        if (y1 < y2) {
+            lowPoint = new double[]{x1, y1};
+            highPoint = new double[]{x2, y2};
+        } else {
+            lowPoint = new double[]{x2, y2};
+            highPoint = new double[]{x1, y1};
+        }
+        double[] lineVector = new double[]{highPoint[0] - lowPoint[0], highPoint[1] - lowPoint[1]};
+        double[] perpendicular = new double[]{lowPoint[1] - testPoint[1], testPoint[0] - lowPoint[0]};
+        double dot = lineVector[0] * perpendicular[0] + lineVector[1] * perpendicular[1];
+        int sideOfLine;
+        if (Math.abs(dot) < COLLISION_EPSILON) {
+            sideOfLine = 0;
+        } else if (dot > 0) {
+            sideOfLine = 1;
+        } else {
+            sideOfLine = -1;
+        }
+        return sideOfLine;
+    }
+
+    private static String coordinateList2String(double[] coordinates) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int pointIndex = 0; pointIndex < coordinates.length/2; pointIndex++) {
+            int xIndex = 2 * pointIndex;
+            int yIndex = xIndex + 1;
+            double xCoordinate = coordinates[xIndex];
+            double yCoordinate = coordinates[yIndex];
+            stringBuilder.append(String.format("x: %f, y: %f\n", xCoordinate, yCoordinate));
+        }
+        return stringBuilder.toString();
     }
 
 }

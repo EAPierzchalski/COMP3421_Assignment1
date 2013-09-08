@@ -108,6 +108,7 @@ public class CollisionTest {
         expectCollisionWith(gameEngine, -2.5, 0.5, square);
         expectCollisionWith(gameEngine, -3.5, 0.5, square);
         expectCollisionWith(gameEngine, -3, 0, square);
+        expectMissWith(gameEngine, -3, -0.01, square);
     }
 
     @Test
@@ -159,15 +160,4 @@ public class CollisionTest {
         Assert.assertTrue(!collisions.contains(polygonalGameObject));
     }
 
-    private static String coordinateList2String(double[] coordinates) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int pointIndex = 0; pointIndex < coordinates.length/2; pointIndex++) {
-            int xIndex = 2 * pointIndex;
-            int yIndex = xIndex + 1;
-            double xCoordinate = coordinates[xIndex];
-            double yCoordinate = coordinates[yIndex];
-            stringBuilder.append(String.format("x: %f, y: %f\n", xCoordinate, yCoordinate));
-        }
-        return stringBuilder.toString();
-    }
 }
