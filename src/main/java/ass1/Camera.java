@@ -41,6 +41,7 @@ public class Camera extends GameObject {
     
     public void setView(GL2 gl) {
         // TODO 1. clear the view to the background colour
+        //gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
         gl.glClearColor(myBackground[0], myBackground[1], myBackground[2], myBackground[3]);
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         

@@ -40,6 +40,7 @@ public class SailingGame extends JFrame {
     private void init()  throws IOException {
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities glcapabilities = new GLCapabilities(glprofile);
+        //Hey look anti-aliasing is like two lines omg totes putting it in
         glcapabilities.setSampleBuffers(true);
         glcapabilities.setNumSamples(4);
         myPanel = new GLJPanel(glcapabilities);
