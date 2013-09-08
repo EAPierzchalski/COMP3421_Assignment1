@@ -1,6 +1,7 @@
 package ass1.solarSystemGame;
 
 import ass1.Mouse;
+import ass1.solarSystemGame.objects.rocketcamera.RocketCamera;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import javax.media.opengl.GLCapabilities;
@@ -24,7 +25,8 @@ public class SolarSystemGame {
         glCapabilities.setSampleBuffers(true);
         glCapabilities.setNumSamples(4);
 
-        SolarSystemGameEngine solarSystemGameEngine = new SolarSystemGameEngine();
+        RocketCamera rocketCamera = new RocketCamera();
+        SolarSystemGameEngine solarSystemGameEngine = new SolarSystemGameEngine(rocketCamera);
 
         GLJPanel gamePanel = new GLJPanel(glCapabilities);
         JFrame gameFrame = new JFrame("Test Game");

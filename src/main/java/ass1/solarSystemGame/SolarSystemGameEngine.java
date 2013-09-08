@@ -4,6 +4,7 @@ import ass1.GameEngine;
 import ass1.GameObject;
 import ass1.solarSystemGame.objects.rocket.Rocket;
 import ass1.solarSystemGame.objects.rocketcamera.RocketCamera;
+import ass1.solarSystemGame.objects.sun.Sun;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,27 +18,39 @@ import java.awt.event.KeyListener;
 
 public class SolarSystemGameEngine extends GameEngine implements KeyListener {
 
-    public Rocket rocket;
+    private Rocket rocket;
 
-    public static RocketCamera rocketCamera = new RocketCamera();
+    private Sun sun;
+
+    private RocketCamera rocketCamera;
+
+    private double angleStep = 2;
 
     /**
      * Construct a new game engine.
      *
      */
-    public SolarSystemGameEngine() {
-        super(rocketCamera);
-        rocket = new Rocket(GameObject.ROOT);
-        rocketCamera.setParent(rocket);
-    }
-
-    public void init() {
-
+    public SolarSystemGameEngine(RocketCamera camera) {
+        super(camera);
+        this.rocketCamera = camera;
+        this.sun = new Sun(GameObject.ROOT);
+        this.rocket = new Rocket(GameObject.ROOT);
+        this.rocket.translate(20, 0);
+        this.rocketCamera.setTarget(rocket);
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (e.getKeyChar() == 'c') {
+            this.rocketCamera.setFollowingTargetRotation(!this.rocketCamera.isFollowingTargetRotation());
+        } else if (e.getKeyChar() == 'a') {
+            this.rocket.accelerateAngularVelocity(angleStep);
+        } else if (e.getKeyChar() == 'd') {
+            this.rocket.accelerateAngularVelocity(-angleStep);
+        } else if (e.getKeyChar() == 'w') {
+            this.rocket.getFlame().turnOn();
+            this.rocket.increaseImpulse(5);
+        }
     }
 
     @Override
@@ -49,4 +62,5 @@ public class SolarSystemGameEngine extends GameEngine implements KeyListener {
     public void keyReleased(KeyEvent e) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
 }

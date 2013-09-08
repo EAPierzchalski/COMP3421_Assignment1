@@ -16,12 +16,12 @@ public class Body extends PolygonalGameObject {
     private static final double[] ROCKET_EDGE_COLOR = new double[]{0.7, 0.7, 0.7, 1};
 
     private static final double[] POLYGON_POINTS = new double[]
-            {0,   -1,
-             3,   0,
-             0,   1};
+            {-1,  0,
+             0,   3,
+             1,   0};
 
-    public Body(GameObject gameObject) {
-        super(gameObject, POLYGON_POINTS, ROCKET_BODY_COLOR, ROCKET_EDGE_COLOR);
+    public Body(GameObject parent) {
+        super(parent, POLYGON_POINTS, ROCKET_BODY_COLOR, ROCKET_EDGE_COLOR);
     }
 
 }

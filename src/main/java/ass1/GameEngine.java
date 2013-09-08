@@ -191,16 +191,4 @@ public class GameEngine implements GLEventListener {
         return sideOfLine;
     }
 
-    private static String coordinateList2String(double[] coordinates) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int pointIndex = 0; pointIndex < coordinates.length/2; pointIndex++) {
-            int xIndex = 2 * pointIndex;
-            int yIndex = xIndex + 1;
-            double xCoordinate = coordinates[xIndex];
-            double yCoordinate = coordinates[yIndex];
-            stringBuilder.append(String.format("x: %f, y: %f\n", xCoordinate, yCoordinate));
-        }
-        return stringBuilder.toString();
-    }
-
 }
