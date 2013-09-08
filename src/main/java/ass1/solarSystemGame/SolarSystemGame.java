@@ -1,7 +1,5 @@
-package ass1.testGame;
+package ass1.solarSystemGame;
 
-import ass1.Camera;
-import ass1.GameEngine;
 import ass1.Mouse;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -18,7 +16,7 @@ import java.awt.*;
  * Time: 4:35 PM
  * To change this template use File | Settings | File Templates.
  */
-public class TestGame {
+public class SolarSystemGame {
 
     public static void main(String[] args) {
         GLProfile glProfile = GLProfile.getDefault();
@@ -26,13 +24,13 @@ public class TestGame {
         glCapabilities.setSampleBuffers(true);
         glCapabilities.setNumSamples(4);
 
-        Camera camera = new Camera();
-        GameEngine gameEngine = new GameEngine(camera);
+        SolarSystemGameEngine solarSystemGameEngine = new SolarSystemGameEngine();
 
         GLJPanel gamePanel = new GLJPanel(glCapabilities);
         JFrame gameFrame = new JFrame("Test Game");
 
-        gamePanel.addGLEventListener(gameEngine);
+        gamePanel.addGLEventListener(solarSystemGameEngine);
+        gamePanel.addKeyListener(solarSystemGameEngine);
         gamePanel.addMouseListener(Mouse.theMouse);
         gamePanel.addMouseMotionListener(Mouse.theMouse);
 

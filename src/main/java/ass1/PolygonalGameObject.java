@@ -123,7 +123,7 @@ public class PolygonalGameObject extends GameObject {
         if (myLineColour != null) {
             gl.glColor4dv(myLineColour, 0);
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
-            gl.glPolygonOffset(-1f, -1f);
+            //gl.glPolygonOffset(10f, 10f);
             gl.glLineWidth(1f);
             drawMyPolygon(gl, GL2.GL_POLYGON);
         }
