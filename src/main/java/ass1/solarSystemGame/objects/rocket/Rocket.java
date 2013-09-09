@@ -3,6 +3,7 @@ package ass1.solarSystemGame.objects.rocket;
 import ass1.GameObject;
 import ass1.MathUtil;
 import ass1.solarSystemGame.objects.CelestialObject;
+import ass1.solarSystemGame.objects.CelestialObjectUtil;
 
 import javax.media.opengl.GL2;
 
@@ -18,9 +19,10 @@ public class Rocket extends GameObject {
     private Flame flame;
     private double[] velocity;
     private double angularVelocity = 0;
-    private double maxAngularVelocity = 60;
-    private double impulse = 0;
-    private double maxImpulse = 10;
+    public static double MAX_ANGULAR_VELOCITY = 30;
+    public static double MAX_BURN_TIME = 0.5;
+    public static double BURN_POWER = 5;
+    private double burnTime = 0;
 
     /**
      * Public constructor for creating GameObjects, connected to a parent (possibly the ROOT).
@@ -49,46 +51,17 @@ public class Rocket extends GameObject {
     }
 
     public void accelerateAngularVelocity(double dJ) {
-        this.angularVelocity = MathUtil.clamp(this.angularVelocity + dJ, -this.maxAngularVelocity, this.maxAngularVelocity);
+        this.angularVelocity = MathUtil.clamp(this.angularVelocity + dJ, -MAX_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
     }
 
-    public double getMaxAngularVelocity() {
-        return maxAngularVelocity;
-    }
-
-    public double[] getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(double vx, double vy) {
-        this.velocity[0] = vx;
-        this.velocity[1] = vy;
-    }
 
     public void accelerate(double dvx, double dvy) {
         this.velocity[0] += dvx;
         this.velocity[1] += dvy;
     }
 
-    public void increaseImpulse(double dI) {
-        this.impulse = MathUtil.clamp(impulse + dI, 0, maxImpulse);
-    }
-
-    public void move(double dt) {
-        double[] position = this.getPosition();
-        position[0] += this.velocity[0] * dt;
-        position[1] += this.velocity[1] * dt;
-        this.setPosition(position[0], position[1]);
-    }
-
-    @Override
-    public void drawSelf(GL2 gl) {
-        super.drawSelf(gl);    //To change body of overridden methods use File | Settings | File Templates.
-        gl.glColor3d(0, 0.2, 1);
-        gl.glBegin(GL2.GL_LINE); {
-            gl.glVertex2d(0, 0);
-            gl.glVertex2d(5 * Math.cos(getGlobalRotation()), 5 * Math.sin(getGlobalRotation()));
-        } gl.glEnd();
+    public void addBurnTime(double burnTime) {
+        this.burnTime = MathUtil.clamp(this.burnTime + burnTime, 0, MAX_BURN_TIME);
     }
 
     @Override
@@ -96,11 +69,13 @@ public class Rocket extends GameObject {
         super.update(dt);    //To change body of overridden methods use File | Settings | File Templates.
         for (GameObject gameObject : GameObject.ALL_OBJECTS) {
             if (gameObject instanceof CelestialObject) {
-                //double[] force = CelestialObjectUtil.force(this, (CelestialObject) gameObject);
-                //this.accelerate(force[0], force[1]);
+                double[] force = CelestialObjectUtil.force(this, (CelestialObject) gameObject);
+                //System.out.println(MathUtil.printVector(force));
+                this.accelerate(force[0] * dt, force[1] * dt);
             }
         }
-        this.accelerateByImpulse(dt);
+
+        this.burn(dt);
         this.move(dt);
         this.turn(dt);
     }
@@ -109,11 +84,24 @@ public class Rocket extends GameObject {
         this.rotate(angularVelocity * dt);
     }
 
-    private void accelerateByImpulse(double dt) {
-        double changeInImpulse = impulse * dt;
-        double newImpulse = MathUtil.clamp(impulse - changeInImpulse, 0, maxImpulse);
-        impulse = newImpulse;
-        velocity[0] += Math.sin(getGlobalRotation()) * changeInImpulse;
-        velocity[1] += Math.cos(getGlobalRotation()) * changeInImpulse;
+    private void burn(double dt) {
+        this.burnTime = MathUtil.clamp(this.burnTime - dt, 0, MAX_BURN_TIME);
+        if (this.burnTime == 0) {
+            flame.turnOff();
+        } else {
+            double radians = Math.toRadians(this.getRotation());
+            double xBurnPower = Math.cos(radians) * BURN_POWER * dt;
+            double yBurnPower = Math.sin(radians) * BURN_POWER * dt;
+            //System.out.println(MathUtil.printVector(new double[]{xBurnPower, yBurnPower}));
+            this.accelerate(xBurnPower, yBurnPower);
+            flame.turnOn();
+        }
+    }
+
+    public void move(double dt) {
+        double[] position = this.getPosition();
+        position[0] += this.velocity[0] * dt;
+        position[1] += this.velocity[1] * dt;
+        this.setPosition(position[0], position[1]);
     }
 }

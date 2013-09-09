@@ -9,7 +9,7 @@ import ass1.GameObject;
  * Project: COMP3421_Assignment1
  */
 public abstract class CelestialObjectUtil {
-    public static final double GRAVITATIONAL_CONSTANT = 1;
+    public static final double GRAVITATIONAL_CONSTANT = 10;
     public static double[] force(GameObject gameObject, CelestialObject celestialObject) {
         double[] force = new double[2];
         double[] gameObjectPosition = gameObject.getPosition();

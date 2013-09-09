@@ -17,10 +17,11 @@ public class RocketCamera extends Camera {
 
     private GameObject target = ROOT;
 
-    public RocketCamera() {
+    public RocketCamera(GameObject target) {
         super();
         this.setBackground(BLACK);
         this.scale(DEFAULT_SCALE);
+        this.target = target;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class RocketCamera extends Camera {
     public double getGlobalRotation() {
         double rotation;
         if (followingTargetRotation) {
-            rotation = target.getGlobalRotation();
+            rotation = target.getGlobalRotation() - 90;
         } else {
             rotation = super.getGlobalRotation();    //To change body of overridden methods use File | Settings | File Templates.
         }
@@ -48,7 +49,7 @@ public class RocketCamera extends Camera {
     public double getRotation() {
         double rotation;
         if (followingTargetRotation) {
-            rotation = target.getRotation();
+            rotation = target.getRotation() - 90;
         } else {
             rotation = super.getRotation();    //To change body of overridden methods use File | Settings | File Templates.
         }

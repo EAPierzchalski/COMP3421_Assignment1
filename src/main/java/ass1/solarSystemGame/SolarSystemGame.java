@@ -1,6 +1,12 @@
 package ass1.solarSystemGame;
 
+import ass1.GameObject;
 import ass1.Mouse;
+import ass1.solarSystemGame.engine.SolarSystemGameEngine;
+import ass1.solarSystemGame.engine.keybindings.CameraKeyHandler;
+import ass1.solarSystemGame.engine.keybindings.LeftKeyHandler;
+import ass1.solarSystemGame.engine.keybindings.RightKeyHandler;
+import ass1.solarSystemGame.engine.keybindings.UpKeyHandler;
 import ass1.solarSystemGame.objects.rocketcamera.RocketCamera;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -13,37 +19,61 @@ import java.awt.*;
 /**
  * Created with IntelliJ IDEA.
  * User: Edward
- * Date: 1/09/13
- * Time: 4:35 PM
+ * Date: 9/09/13
+ * Time: 11:42 AM
  * To change this template use File | Settings | File Templates.
  */
-public class SolarSystemGame {
+public class SolarSystemGame extends JFrame {
 
-    public static void main(String[] args) {
+    private static SolarSystemGame theGame = new SolarSystemGame();
+
+    private SolarSystemGame() {
+        super("Solar System Rocketry");
+    }
+
+    private void init() {
         GLProfile glProfile = GLProfile.getDefault();
         GLCapabilities glCapabilities = new GLCapabilities(glProfile);
         glCapabilities.setSampleBuffers(true);
         glCapabilities.setNumSamples(4);
 
-        RocketCamera rocketCamera = new RocketCamera();
-        SolarSystemGameEngine solarSystemGameEngine = new SolarSystemGameEngine(rocketCamera);
-
         GLJPanel gamePanel = new GLJPanel(glCapabilities);
-        JFrame gameFrame = new JFrame("Test Game");
 
-        gamePanel.addGLEventListener(solarSystemGameEngine);
-        gamePanel.addKeyListener(solarSystemGameEngine);
+        RocketCamera rocketCamera = new RocketCamera(GameObject.ROOT);
+        SolarSystemGameEngine gameEngine = new SolarSystemGameEngine(rocketCamera);
+
+        gamePanel.addGLEventListener(gameEngine);
         gamePanel.addMouseListener(Mouse.theMouse);
         gamePanel.addMouseMotionListener(Mouse.theMouse);
 
-        FPSAnimator fpsAnimator = new FPSAnimator(60);
-        fpsAnimator.add(gamePanel);
+        this.addKeyBindings(gamePanel, gameEngine);
+
+        gameEngine.init();
+
+        FPSAnimator fpsAnimator = new FPSAnimator(gamePanel, 60);
         fpsAnimator.start();
 
-        gameFrame.getContentPane().add(gamePanel, BorderLayout.CENTER);
-        gameFrame.setSize(1024, 768);
-        gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        gameFrame.setVisible(true);
+        this.getContentPane().add(gamePanel, BorderLayout.CENTER);
+        this.setSize(1024, 768);
+        this.setVisible(true);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
+    private void addKeyBindings(JComponent jComponent, SolarSystemGameEngine gameEngine) {
+        LeftKeyHandler leftKeyHandler = new LeftKeyHandler(gameEngine);
+        leftKeyHandler.addTo(jComponent);
+
+        RightKeyHandler rightKeyHandler = new RightKeyHandler(gameEngine);
+        rightKeyHandler.addTo(jComponent);
+
+        UpKeyHandler upKeyHandler = new UpKeyHandler(gameEngine);
+        upKeyHandler.addTo(jComponent);
+
+        CameraKeyHandler cameraKeyHandler = new CameraKeyHandler(gameEngine);
+        cameraKeyHandler.addTo(jComponent);
+    }
+
+    public static void main(String[] args) {
+        theGame.init();
+    }
 }

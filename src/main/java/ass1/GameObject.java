@@ -115,7 +115,7 @@ public class GameObject {
      * @return
      */
     public double getRotation() {
-        return myRotation;
+        return MathUtil.normaliseAngle(myRotation);
     }
 
     /**
