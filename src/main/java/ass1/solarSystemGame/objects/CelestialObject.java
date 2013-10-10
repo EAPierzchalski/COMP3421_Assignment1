@@ -9,5 +9,5 @@ package ass1.solarSystemGame.objects;
 public interface CelestialObject {
     public double getMass();
     public double getRadius();
-    public double[] getPosition();
+    public double[] getGlobalPosition();
 }

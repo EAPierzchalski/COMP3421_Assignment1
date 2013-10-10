@@ -3,10 +3,7 @@ package ass1.solarSystemGame;
 import ass1.GameObject;
 import ass1.Mouse;
 import ass1.solarSystemGame.engine.SolarSystemGameEngine;
-import ass1.solarSystemGame.engine.keybindings.CameraKeyHandler;
-import ass1.solarSystemGame.engine.keybindings.LeftKeyHandler;
-import ass1.solarSystemGame.engine.keybindings.RightKeyHandler;
-import ass1.solarSystemGame.engine.keybindings.UpKeyHandler;
+import ass1.solarSystemGame.engine.keybindings.*;
 import ass1.solarSystemGame.objects.rocketcamera.RocketCamera;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -71,6 +68,15 @@ public class SolarSystemGame extends JFrame {
 
         CameraKeyHandler cameraKeyHandler = new CameraKeyHandler(gameEngine);
         cameraKeyHandler.addTo(jComponent);
+
+        ZoomInKeyHandler zoomInKeyHandler = new ZoomInKeyHandler(gameEngine);
+        zoomInKeyHandler.addTo(jComponent);
+
+        ZoomOutKeyHandler zoomOutKeyHandler = new ZoomOutKeyHandler(gameEngine);
+        zoomOutKeyHandler.addTo(jComponent);
+
+        FireKeyHandler fireKeyHandler = new FireKeyHandler(gameEngine);
+        fireKeyHandler.addTo(jComponent);
     }
 
     public static void main(String[] args) {

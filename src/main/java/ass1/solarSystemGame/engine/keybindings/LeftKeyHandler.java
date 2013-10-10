@@ -35,6 +35,6 @@ public class LeftKeyHandler extends AbstractKeyHandler {
     @Override
     public void actionPerformed(ActionEvent e) {
         Rocket rocket = this.theEngine.getRocket();
-        rocket.accelerateAngularVelocity(Rocket.MAX_ANGULAR_VELOCITY);
+        rocket.accelerateAngularVelocity(Rocket.ANGULAR_VELOCITY_STEP);
     }
 }

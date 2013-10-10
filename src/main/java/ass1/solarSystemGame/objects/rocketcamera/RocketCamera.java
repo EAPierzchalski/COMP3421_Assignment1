@@ -17,6 +17,8 @@ public class RocketCamera extends Camera {
 
     private GameObject target = ROOT;
 
+    private static double ZOOM_FACTOR = 1.1;
+
     public RocketCamera(GameObject target) {
         super();
         this.setBackground(BLACK);
@@ -72,5 +74,13 @@ public class RocketCamera extends Camera {
 
     public void setTarget(GameObject target) {
         this.target = target;
+    }
+
+    public void zoomIn() {
+        this.scale(1d/ZOOM_FACTOR);
+    }
+
+    public void zoomOut() {
+        this.scale(ZOOM_FACTOR);
     }
 }

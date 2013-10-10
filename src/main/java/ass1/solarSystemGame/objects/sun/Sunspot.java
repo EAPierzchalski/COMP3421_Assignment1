@@ -2,6 +2,9 @@ package ass1.solarSystemGame.objects.sun;
 
 import ass1.GameObject;
 import ass1.PolygonalGameObject;
+import ass1.solarSystemGame.objects.CelestialObjectUtil;
+
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,23 +16,28 @@ import ass1.PolygonalGameObject;
 public class Sunspot extends PolygonalGameObject {
     private static double[] SUNSPOT_BROWN = new double[]{0.75, 0.3, 0, 1};
     private static double[] SUNSPOT_DARK_BROWN = new double[]{0.5, 0.1, 0, 1};
+    private static double AVERAGE_SPOT_ROTATION = 10;
 
-    /**
-     * Create a polygonal game object and add it to the scene tree
-     * <p/>
-     * The polygon is specified as a list of doubles in the form:
-     * <p/>
-     * [ x0, y0, x1, y1, x2, y2, ... ]
-     * <p/>
-     * The line and fill colours can possibly be null, in which case that part of the object
-     * should not be drawn.
-     *
-     * @param parent     The parent in the scene tree
-     * @param points     A list of points defining the polygon
-     * @param fillColour The fill colour in [r, g, b, a] form
-     * @param lineColour The outlien colour in [r, g, b, a] form
-     */
-    public Sunspot(Sun parent, double[] points, double[] fillColour, double[] lineColour) {
-        super(parent, points, fillColour, lineColour);
+    private double rotationSpeed = 0;
+
+    private static double[] pointCoordinates = CelestialObjectUtil.polygonPoints(10, 0.5);
+
+    public Sunspot(Sun parent, double angle, double radius, double scale) {
+        super(parent, pointCoordinates, SUNSPOT_BROWN, SUNSPOT_DARK_BROWN);
+        Random rand = new Random();
+        double myRotation = rand.nextDouble() * 360;
+        this.rotate(myRotation);
+        this.scale(scale);
+        double radians = Math.toRadians(angle);
+        double dx = Math.cos(radians) * radius;
+        double dy = Math.sin(radians) * radius;
+        this.translate(dx, dy);
+        this.rotationSpeed = rand.nextDouble() * 2 * AVERAGE_SPOT_ROTATION;
+    }
+
+    @Override
+    public void update(double dt) {
+        super.update(dt);    //To change body of overridden methods use File | Settings | File Templates.
+        this.rotate(rotationSpeed * dt);
     }
 }

@@ -3,6 +3,9 @@ package ass1.solarSystemGame.objects.sun;
 import ass1.GameObject;
 import ass1.PolygonalGameObject;
 import ass1.solarSystemGame.objects.CelestialObject;
+import ass1.solarSystemGame.objects.CelestialObjectUtil;
+
+import java.util.Random;
 
 /**
  * User: Pierzchalski
@@ -22,31 +25,46 @@ public class Sun extends PolygonalGameObject implements CelestialObject {
 
     private static final int NUM_SIDES = 75;
 
-    private static final double[] POLYGON_POINTS = polygonPoints(NUM_SIDES);
+    private static final int NUM_SUNSPOTS = 30;
+
+    private double rotationSpeed = 5;
+
+    private GameObject pivot;
+
+    private static final double[] POLYGON_POINTS = CelestialObjectUtil.polygonPoints(NUM_SIDES, RADIUS);
 
     public Sun(GameObject gameObject) {
-        super(gameObject, POLYGON_POINTS, SUN_YELLOW, SUN_ORANGE);
-    }
-
-    private static double[] polygonPoints(int numSides) {
-        double[] coordinates = new double[numSides * 2];
-        for (int i = 0; i < numSides; i++) {
-            int xIndex = 2 * i;
-            int yIndex = xIndex + 1;
-            double circleFraction = (double) i / (double) numSides;
-            double xCoordinate = RADIUS * Math.cos(2 * Math.PI * circleFraction);
-            double yCoordinate = RADIUS * Math.sin(2 * Math.PI * circleFraction);
-            coordinates[xIndex] = xCoordinate;
-            coordinates[yIndex] = yCoordinate;
+        super(ROOT, POLYGON_POINTS, SUN_YELLOW, SUN_ORANGE);
+        this.pivot = new GameObject(gameObject);
+        this.setParent(pivot);
+        Random rand = new Random();
+        for (int i = 0; i < NUM_SUNSPOTS; i++) {
+            double scale = Math.pow(rand.nextDouble(), 2);
+            double angle = 360 * rand.nextDouble();
+            double radius = -1;
+            while (!(radius > 0 && radius < RADIUS - 2)) {
+                radius = rand.nextGaussian() * 2 * RADIUS;
+            }
+            //System.out.println(angle);
+            Sunspot sunspot = new Sunspot(this, angle, radius, scale);
         }
-        return coordinates;
     }
 
     public double getRadius() {
         return RADIUS;
     }
 
+    public GameObject getPivot() {
+        return pivot;
+    }
+
     public double getMass() {
         return MASS;
+    }
+
+    @Override
+    public void update(double dt) {
+        super.update(dt);    //To change body of overridden methods use File | Settings | File Templates.
+        this.rotate(rotationSpeed * dt);
     }
 }

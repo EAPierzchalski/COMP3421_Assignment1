@@ -2,6 +2,7 @@ package ass1.solarSystemGame.engine;
 
 import ass1.GameEngine;
 import ass1.GameObject;
+import ass1.solarSystemGame.objects.Planet.Planet;
 import ass1.solarSystemGame.objects.rocket.Rocket;
 import ass1.solarSystemGame.objects.rocketcamera.RocketCamera;
 import ass1.solarSystemGame.objects.sun.Sun;
@@ -19,9 +20,12 @@ import java.awt.event.KeyEvent;
  */
 public class SolarSystemGameEngine extends GameEngine {
 
+    private static double PLANET_ORBIT_RADIUS = 70;
+
     private RocketCamera rocketCamera;
     private Sun sun;
     private Rocket rocket;
+    private Planet planet;
 
     public SolarSystemGameEngine(RocketCamera rocketCamera) {
         super(rocketCamera);
@@ -30,6 +34,7 @@ public class SolarSystemGameEngine extends GameEngine {
 
     public void init() {
         this.sun = new Sun(GameObject.ROOT);
+        this.planet = new Planet(sun.getPivot(), PLANET_ORBIT_RADIUS, 1, 20);
         this.rocket = new Rocket(GameObject.ROOT);
         rocketCamera.setTarget(rocket);
         rocket.setPosition(20, 10);

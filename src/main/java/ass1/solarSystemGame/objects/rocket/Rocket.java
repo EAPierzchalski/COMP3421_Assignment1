@@ -4,6 +4,7 @@ import ass1.GameObject;
 import ass1.MathUtil;
 import ass1.solarSystemGame.objects.CelestialObject;
 import ass1.solarSystemGame.objects.CelestialObjectUtil;
+import ass1.solarSystemGame.objects.laserbolt.LaserBolt;
 
 import javax.media.opengl.GL2;
 
@@ -19,7 +20,9 @@ public class Rocket extends GameObject {
     private Flame flame;
     private double[] velocity;
     private double angularVelocity = 0;
-    public static double MAX_ANGULAR_VELOCITY = 30;
+    public static double MAX_ANGULAR_VELOCITY = 180;
+    public static int NUM_ANGULAR_VELOCITY_STEPS = 4;
+    public static double ANGULAR_VELOCITY_STEP = MAX_ANGULAR_VELOCITY / NUM_ANGULAR_VELOCITY_STEPS;
     public static double MAX_BURN_TIME = 0.5;
     public static double BURN_POWER = 5;
     private double burnTime = 0;
@@ -48,6 +51,13 @@ public class Rocket extends GameObject {
 
     public double getAngularVelocity() {
         return angularVelocity;
+    }
+
+    public double[] getVelocity() {
+        double[] v = new double[2];
+        v[0] = velocity[0];
+        v[1] = velocity[1];
+        return v;
     }
 
     public void accelerateAngularVelocity(double dJ) {
@@ -103,5 +113,9 @@ public class Rocket extends GameObject {
         position[0] += this.velocity[0] * dt;
         position[1] += this.velocity[1] * dt;
         this.setPosition(position[0], position[1]);
+    }
+
+    public void pewpew() {
+        LaserBolt laserBolt = new LaserBolt(this);
     }
 }
